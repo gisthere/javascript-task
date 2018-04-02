@@ -7,6 +7,8 @@ const querystring = require('querystring');
 module.exports.execute = execute;
 module.exports.isStar = true;
 
+const MESSAGES_ENDPOINT = 'http://localhost:8080/messages/';
+
 function execute() {
 
     const commands = ['send', 'list'];
@@ -34,14 +36,10 @@ function execute() {
     if (args.command === 'send') {
         params.text = args.text;
 
-        return sendMessage(params).then(message => {
-            return Promise.resolve(colorMessages([message]));
-        });
+        return sendMessage(params).then(message => Promise.resolve(colorMessages([message])));
     }
 
-    return getMessages(params).then(messages => {
-        return Promise.resolve(colorMessages(messages));
-    });
+    return getMessages(params).then(messages => Promise.resolve(colorMessages(messages)));
 }
 
 function parseCommandArgs() {
@@ -97,7 +95,8 @@ function sendMessage(params) {
     }
     const body = { text: params.text };
 
-    return got.post('http://localhost:8080/messages/',
+
+    return got.post(MESSAGES_ENDPOINT,
         {
             json: true,
             query: querystring.stringify(query),
@@ -106,7 +105,7 @@ function sendMessage(params) {
 }
 
 function getMessages(params) {
-    return got.get('http://localhost:8080/messages/',
+    return got.get(MESSAGES_ENDPOINT,
         {
             json: true,
             query: querystring.stringify(params)
